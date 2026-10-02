@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "bin": {
-    "opencode-history-search-v2": "./bin/upgrade.js"
+    "opencode-history-search-v2": "bin/upgrade.js"
   },
   "files": [
     "src",
