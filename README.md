@@ -1,4 +1,4 @@
-# opencode-history-search-v2
+# opencode-history-search-v2-wlarsong
 
 > ## ⚠️ This is an OpenCode **V2** modification
 >
@@ -17,6 +17,9 @@
 >   tool, same history data — rewritten for the V2 plugin API.
 > - If you are still on **OpenCode V1**, keep using the original package;
 >   nothing here is needed. See [Upgrading from V1](#upgrading-from-v1).
+> - **Note:** an unrelated package named `opencode-history-search-v2` also
+>   exists on npm (a different author's port). This package is
+>   **`opencode-history-search-v2-wlarsong`** — install that exact name.
 
 Search through your OpenCode conversation history across **all projects**
 or within the **current repository**. Supports keyword, regex, fuzzy, and
@@ -59,7 +62,7 @@ Add to your OpenCode config (`~/.config/opencode/opencode.json`):
 {
   "$schema": "https://opencode.ai/config.json",
   "plugins": [
-    "opencode-history-search-v2"
+    "opencode-history-search-v2-wlarsong"
   ]
 }
 ```
@@ -98,7 +101,7 @@ intentional V2 plugin API breaking change). This package ships a config
 upgrade helper:
 
 ```sh
-npx opencode-history-search-v2             # once published to npm
+npx opencode-history-search-v2-wlarsong    # once published to npm
 # or from a clone:
 node bin/upgrade.js                        # plain Node (or Bun)
 node bin/upgrade.js --global               # also update the global config
@@ -110,7 +113,7 @@ It will:
    are still on V1).
 2. Find project config files (and the global config with `--global`) that
    reference `opencode-history-search`.
-3. Replace the entry with `opencode-history-search-v2`, writing a
+3. Replace the entry with `opencode-history-search-v2-wlarsong`, writing a
    `.bak-*` backup of each file first.
 
 Your conversation history is untouched — both versions read the same

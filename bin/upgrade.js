@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Config upgrade helper for moving from opencode-history-search (V1) to
- * opencode-history-search-v2 (OpenCode V2).
+ * opencode-history-search-v2-wlarsong (OpenCode V2).
  *
  * Usage:
- *   npx opencode-history-search-v2           # once installed/published
+ *   npx opencode-history-search-v2-wlarsong  # once installed/published
  *   node bin/upgrade.js                      # from a clone
  *   node bin/upgrade.js --global             # also update the global config
  *
@@ -12,8 +12,8 @@
  *   1. Detects your OpenCode version (V1 vs V2).
  *   2. Finds project config files (cwd and every ancestor) that reference
  *      the V1 package; with --global, the global config as well.
- *   3. Replaces "opencode-history-search" with "opencode-history-search-v2"
- *      (backing up each file first).
+ *   3. Replaces "opencode-history-search" with
+ *      "opencode-history-search-v2-wlarsong" (backing up each file first).
  *
  * What it does NOT do:
  *   - Your conversation history is untouched — both versions read the same
@@ -31,7 +31,7 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 
 const V1_NAME = "opencode-history-search";
-const V2_NAME = "opencode-history-search-v2";
+const V2_NAME = "opencode-history-search-v2-wlarsong";
 
 async function detectOpencodeVersion() {
   try {
@@ -207,8 +207,8 @@ function migrateFile(file, options) {
 
 async function main() {
   const includeGlobal = process.argv.slice(2).includes("--global");
-  console.log("opencode-history-search-v2 upgrade helper");
-  console.log("------------------------------------------\n");
+  console.log("opencode-history-search-v2-wlarsong upgrade helper");
+  console.log("----------------------------------------------------\n");
 
   const version = await detectOpencodeVersion();
   if (version === null) {
