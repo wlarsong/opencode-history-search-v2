@@ -1,16 +1,17 @@
 {
   "name": "opencode-history-search-v2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Search OpenCode conversation history across all projects or the current repo — OpenCode V2 plugin port of opencode-history-search",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
   "bin": {
-    "opencode-history-search-v2": "./src/upgrade.ts"
+    "opencode-history-search-v2": "./bin/upgrade.js"
   },
   "files": [
-    "src"
+    "src",
+    "bin"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",

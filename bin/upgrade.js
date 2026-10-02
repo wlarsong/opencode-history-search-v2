@@ -1,11 +1,12 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /**
  * Config upgrade helper for moving from opencode-history-search (V1) to
  * opencode-history-search-v2 (OpenCode V2).
  *
  * Usage:
- *   bun src/upgrade.ts            # or: node src/upgrade.ts (Node >= 23.6)
- *   bun src/upgrade.ts --global   # also update the global config
+ *   npx opencode-history-search-v2           # once installed/published
+ *   node bin/upgrade.js                      # from a clone
+ *   node bin/upgrade.js --global             # also update the global config
  *
  * What it does:
  *   1. Detects your OpenCode version (V1 vs V2).
@@ -17,6 +18,9 @@
  * What it does NOT do:
  *   - Your conversation history is untouched — both versions read the same
  *     OpenCode SQLite database.
+ *
+ * Plain JS on purpose: this file is the npm `bin` entrypoint, which must
+ * run under plain Node without a build step.
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -29,7 +33,7 @@ const execFileAsync = promisify(execFile);
 const V1_NAME = "opencode-history-search";
 const V2_NAME = "opencode-history-search-v2";
 
-async function detectOpencodeVersion(): Promise<string | null> {
+async function detectOpencodeVersion() {
   try {
     const { stdout } = await execFileAsync("opencode", ["--version"], {
       timeout: 10_000,
@@ -45,7 +49,7 @@ async function detectOpencodeVersion(): Promise<string | null> {
 /**
  * Strip // and block comments from JSONC, leaving string contents intact.
  */
-function stripJsonc(text: string): string {
+function stripJsonc(text) {
   let out = "";
   let i = 0;
   let inString = false;
@@ -88,7 +92,7 @@ function stripJsonc(text: string): string {
   return out.replace(/,(\s*[}\]])/g, "$1");
 }
 
-function parseConfigFile(file: string): any | null {
+function parseConfigFile(file) {
   try {
     const raw = fs.readFileSync(file, "utf8");
     return JSON.parse(stripJsonc(raw));
@@ -97,7 +101,7 @@ function parseConfigFile(file: string): any | null {
   }
 }
 
-function globalConfigFiles(): string[] {
+function globalConfigFiles() {
   const xdgConfig =
     process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
   const dir = path.join(xdgConfig, "opencode");
@@ -106,8 +110,8 @@ function globalConfigFiles(): string[] {
     .filter((file) => fs.existsSync(file));
 }
 
-function projectConfigFiles(cwd: string): string[] {
-  const files: string[] = [];
+function projectConfigFiles(cwd) {
+  const files = [];
   let dir = cwd;
   // Walk up to the filesystem root, collecting candidate config paths.
   for (;;) {
@@ -126,37 +130,28 @@ function projectConfigFiles(cwd: string): string[] {
   return files;
 }
 
-function isV1Reference(entry: any): boolean {
-  const name =
-    typeof entry === "string"
-      ? entry
-      : Array.isArray(entry)
-        ? entry[0]
-        : typeof entry === "object" && entry !== null
-          ? entry.package
-          : undefined;
-  if (typeof name !== "string") return false;
-  const bare = name.split("@").slice(0, 2).join("@"); // strip version suffix
-  return (
-    bare === V1_NAME || name.startsWith(`${V1_NAME}@`)
-  );
+function entryName(entry) {
+  if (typeof entry === "string") return entry;
+  if (Array.isArray(entry)) return entry[0];
+  if (typeof entry === "object" && entry !== null) return entry.package;
+  return undefined;
 }
 
-function isV2Reference(entry: any): boolean {
-  const name =
-    typeof entry === "string"
-      ? entry
-      : Array.isArray(entry)
-        ? entry[0]
-        : typeof entry === "object" && entry !== null
-          ? entry.package
-          : undefined;
+function isV1Reference(entry) {
+  const name = entryName(entry);
+  if (typeof name !== "string") return false;
+  const bare = name.split("@").slice(0, 2).join("@"); // strip version suffix
+  return bare === V1_NAME || name.startsWith(`${V1_NAME}@`);
+}
+
+function isV2Reference(entry) {
+  const name = entryName(entry);
   if (typeof name !== "string") return false;
   const bare = name.split("@").slice(0, 2).join("@");
   return bare === V2_NAME;
 }
 
-function replaceV1Entry(entry: any): any {
+function replaceV1Entry(entry) {
   if (typeof entry === "string") return V2_NAME;
   if (Array.isArray(entry)) {
     const copy = [...entry];
@@ -169,9 +164,11 @@ function replaceV1Entry(entry: any): any {
   return entry;
 }
 
-type FileOutcome = "changed" | "already-v2" | "clean" | "parse-error";
-
-function migrateFile(file: string, options?: { dryRun?: boolean }): FileOutcome {
+/**
+ * Returns "changed" | "already-v2" | "clean" | "parse-error".
+ * With options.dryRun, reports "changed" without writing anything.
+ */
+function migrateFile(file, options) {
   const config = parseConfigFile(file);
   if (config === null || typeof config !== "object") {
     return "parse-error";
@@ -196,7 +193,7 @@ function migrateFile(file: string, options?: { dryRun?: boolean }): FileOutcome 
     return hasV2 ? "already-v2" : "clean";
   }
 
-  if (options?.dryRun) return "changed";
+  if (options && options.dryRun) return "changed";
 
   const backup = `${file}.bak-${new Date().toISOString().replace(/[:.]/g, "-")}`;
   fs.copyFileSync(file, backup);
@@ -208,7 +205,7 @@ function migrateFile(file: string, options?: { dryRun?: boolean }): FileOutcome 
   return "changed";
 }
 
-async function main(): Promise<void> {
+async function main() {
   const includeGlobal = process.argv.slice(2).includes("--global");
   console.log("opencode-history-search-v2 upgrade helper");
   console.log("------------------------------------------\n");
@@ -241,7 +238,7 @@ your config entry for you.
     console.log("No OpenCode config files found.");
   }
 
-  const outcomes = new Map<string, FileOutcome>();
+  const outcomes = new Map();
   for (const file of files) {
     const outcome = migrateFile(file);
     outcomes.set(file, outcome);

@@ -98,10 +98,10 @@ intentional V2 plugin API breaking change). This package ships a config
 upgrade helper:
 
 ```sh
-bunx opencode-history-search-v2            # after npm publish
+npx opencode-history-search-v2             # once published to npm
 # or from a clone:
-bun src/upgrade.ts                         # or: node src/upgrade.ts (Node >= 23.6)
-bun src/upgrade.ts --global                # also update the global config
+node bin/upgrade.js                        # plain Node (or Bun)
+node bin/upgrade.js --global               # also update the global config
 ```
 
 It will:
