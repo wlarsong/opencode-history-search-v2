@@ -1,0 +1,40 @@
+{
+  "name": "opencode-history-search-v2",
+  "version": "1.0.0",
+  "description": "Search OpenCode conversation history across all projects or the current repo — OpenCode V2 plugin port of opencode-history-search",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "opencode-history-search-v2": "./src/upgrade.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "smoke": "node --import ./scripts/register-sqlite-shim.mjs scripts/smoke.ts"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "plugin",
+    "v2",
+    "history",
+    "search",
+    "sqlite"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.22",
+    "fuse.js": "^7.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "typescript": "^5"
+  }
+}
